@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component;
 import com.jonesgeeks.dislexa.handle.audio.HotwordProcessor;
 
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.GuildVoiceState;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -63,14 +60,10 @@ public class JoinVoiceChannelRequestListener implements EventListener{
 		if (user.isBot()) {
 			return;
 		}
-
-		MessageChannel channel = message.getChannel();
 		
 		if (event.isFromType(ChannelType.TEXT)) {
-			Guild guild = message.getGuild();
+			TextChannel channel = message.getTextChannel();
 			Member member = event.getMember();
-			
-			 
 			
 			boolean hasRole = member.isOwner() || member.getRoles().stream().filter(r -> 
 					r.getName().equals("@botcommander")).findFirst().isPresent();
@@ -93,7 +86,7 @@ public class JoinVoiceChannelRequestListener implements EventListener{
 		}
 	}
 	
-	private void join(MessageChannel channel, Member member) {
+	private void join(TextChannel channel, Member member) {
 		GuildVoiceState voiceState = member.getVoiceState();
 		
 		if (!voiceState.inVoiceChannel())
@@ -106,8 +99,8 @@ public class JoinVoiceChannelRequestListener implements EventListener{
 				channel.sendMessage("That room is full!");
 			else {
 				AudioManager manager = voice.getGuild().getAudioManager();
-				manager.openAudioConnection(voice);
 				manager.setReceivingHandler(hotwordProcessor);
+				manager.openAudioConnection(voice);
 				channel.sendMessage("Connected to **" + voice.getName() + "**.");
 			}
 		}

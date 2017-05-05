@@ -3,12 +3,21 @@
  */
 package com.jonesgeeks.dislexa.handle.audio;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import javax.sound.sampled.AudioFormat;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.jonesgeeks.dislexa.hotword.HotwordDetector;
@@ -24,12 +33,32 @@ import net.dv8tion.jda.core.audio.UserAudio;
 @Component
 public class HotwordProcessor implements AudioReceiveHandler{
 
-	@Autowired
-	private HotwordDetector detector;
-
-	private boolean print = true;
+	private @Autowired HotwordDetector detector;
 	
-	AudioFormat OUTPUT_FORMAT = new AudioFormat(48000.0f, 32, 2, true, false);
+	private @Value("${discord.bot.audio.parrot: false}") boolean parrot;
+	
+	private @Value("${discord.bot.audio.canReceive: true}") boolean canReceive = true;
+	
+	private SourceDataLine line;
+	
+	@PostConstruct
+	public void init() throws LineUnavailableException {
+		if(parrot) {
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class, OUTPUT_FORMAT);
+			line = (SourceDataLine) AudioSystem.getLine(info);
+			line.open();
+			line.start();
+		}
+	}
+	
+	@PreDestroy
+	public void close() {
+		if(line != null) {
+			line.drain();
+			line.close();
+			line = null;
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -37,7 +66,7 @@ public class HotwordProcessor implements AudioReceiveHandler{
 	 */
 	@Override
 	public boolean canReceiveUser() {
-		return true;
+		return canReceive;
 	}
 
 	/*
@@ -49,22 +78,7 @@ public class HotwordProcessor implements AudioReceiveHandler{
 		// Ignore any bot trashtalk
 		if(userAudio.getUser().isBot()) return;
 		
-		byte[] audio = userAudio.getAudioData(1.0);
-		
-		if(print) {
-			System.out.println(audio.length);
-			print=false;
-		}
-
-		short[] snowboyData = new short[1600];
-		ByteBuffer.wrap(audio).order(
-				ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(snowboyData);
-
-		// Detection.
-		int result = detector.RunDetection(snowboyData, snowboyData.length);
-		if (result > 0) {
-			System.out.print("Hotword " + result + " detected!\n");
-		}
+		handleAudio(userAudio.getAudioData(1.0));
 	}
 	
 	/*
@@ -82,5 +96,86 @@ public class HotwordProcessor implements AudioReceiveHandler{
 	 */
 	@Override
 	public void handleCombinedAudio(CombinedAudio combinedAudio) {
+		handleAudio(combinedAudio.getAudioData(1.0));
+	}
+	
+	protected void handleAudio(byte[] audio) {
+		short[] snowboyData;
+		try {
+			snowboyData = PCMtoWave(audio);
+
+			// Detection.
+			int result = detector.RunDetection(snowboyData, snowboyData.length);
+			if (result > 0) {
+				System.out.print("Hotword " + result + " detected!\n");
+			}
+			
+			if(parrot && line != null) {
+				byte[] bytes2 = new byte[snowboyData.length * 2];
+				ByteBuffer.wrap(bytes2).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(snowboyData);
+				line.write(bytes2, 0, bytes2.length);
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public short[] PCMtoWave(byte[] rawData) throws IOException {
+		int srate = (int) OUTPUT_FORMAT.getSampleRate();
+		int channel = OUTPUT_FORMAT.getChannels();
+		int format = OUTPUT_FORMAT.getSampleSizeInBits();
+		int bitrate = srate * channel * format;
+		DataOutputStream output = null;
+		short[] shorts;
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			output = new DataOutputStream(baos);
+			// WAVE header
+			// see http://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+			writeString(output, "RIFF"); // chunk id
+			writeInt(output, 36 + rawData.length); // chunk size
+			writeString(output, "WAVE"); // format
+			writeString(output, "fmt "); // subchunk 1 id
+			writeInt(output, 16); // subchunk 1 size
+			writeShort(output, (short) 1); // audio format (1 = PCM)
+			writeShort(output, (short) channel); // number of channels
+			writeInt(output, srate); // sample rate
+			writeInt(output, bitrate * 2); // byte rate
+			writeShort(output, (short) 2); // block align
+			writeShort(output, (short) 16); // bits per sample
+			writeString(output, "data"); // subchunk 2 id
+			writeInt(output, rawData.length); // subchunk 2 size
+			// Audio data (conversion big endian -> little endian)
+			shorts = new short[rawData.length / 2];
+			ByteBuffer.wrap(rawData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+			ByteBuffer bytes = ByteBuffer.allocate(shorts.length * 2);
+			for (short s : shorts) {
+				bytes.putShort(s);
+			}
+		} finally {
+			if (output != null) {
+				output.close();
+			}
+		}
+		return shorts;
+	}
+
+	private void writeInt(final DataOutputStream output, final int value) throws IOException {
+		output.write(value >> 0);
+		output.write(value >> 8);
+		output.write(value >> 16);
+		output.write(value >> 24);
+	}
+
+	private void writeShort(final DataOutputStream output, final short value) throws IOException {
+		output.write(value >> 0);
+		output.write(value >> 8);
+	}
+
+	private void writeString(final DataOutputStream output, final String value) throws IOException {
+		for (int i = 0; i < value.length(); i++) {
+			output.write(value.charAt(i));
+		}
 	}
 }

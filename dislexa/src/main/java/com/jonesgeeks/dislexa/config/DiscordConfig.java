@@ -43,12 +43,19 @@ public class DiscordConfig {
 	
 	@Value("${discord.bot.token}")
 	private String token;
+
+	@Value("${discord.bot.hotword.sensitivity: 0.5}")
+	private String hotwordSensitivity;
+	
+	@Value("${discord.bot.hotword.audioGain: 1}")
+	private float hotwordAudioGain;
 	
 	@Value("classpath:common.res")
     private Resource commonResource;
 	
 	@Value("classpath:alexa.umdl")
     private Resource modelResource;
+	
 
 	@Bean(destroyMethod="shutdown")
 	public JDA getDiscordClient() throws LoginException, IllegalArgumentException, RateLimitedException {
@@ -61,8 +68,8 @@ public class DiscordConfig {
 		
 		SnowboyDetect detector = new SnowboyDetect(copyResourceToTemp(commonResource).getAbsolutePath(), 
 				copyResourceToTemp(modelResource).getAbsolutePath());
-		detector.SetSensitivity("0.5");
-	    detector.SetAudioGain(1);
+		detector.SetSensitivity(hotwordSensitivity);
+	    detector.SetAudioGain(hotwordAudioGain);
 	    return detector;
 	}
 	

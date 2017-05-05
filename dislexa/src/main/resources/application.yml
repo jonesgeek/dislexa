@@ -1,3 +1,9 @@
 discord:
   bot:
-    token: MzA3NjkwMDQ5Mzk3NTg3OTk5.C-V-TQ.qnhH25Fxysf32-sOLpCh9-QNNwQ
+    token: {YOUR_BOT_TOKEN}
+    audio:
+#      parrot: true
+#      canReceive: true
+    hotword:
+      sensitivity: 0.6
+#      audioGain: 1
