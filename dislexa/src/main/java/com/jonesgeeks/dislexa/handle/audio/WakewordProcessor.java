@@ -35,30 +35,8 @@ public class WakewordProcessor implements AudioReceiveHandler {
 
 	private @Autowired WakewordDetector detector;
 	
-	private @Value("${discord.bot.audio.parrot: false}") boolean parrot;
-	
 	private @Value("${discord.bot.audio.canReceive: true}") boolean canReceive = true;
-	
-	private SourceDataLine line;
-	
-	@PostConstruct
-	public void init() throws LineUnavailableException {
-		if(parrot) {
-			DataLine.Info info = new DataLine.Info(SourceDataLine.class, OUTPUT_FORMAT);
-			line = (SourceDataLine) AudioSystem.getLine(info);
-			line.open();
-			line.start();
-		}
-	}
-	
-	@PreDestroy
-	public void close() {
-		if(line != null) {
-			line.drain();
-			line.close();
-			line = null;
-		}
-	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -110,12 +88,6 @@ public class WakewordProcessor implements AudioReceiveHandler {
 				System.out.print("Hotword " + result + " detected!\n");
 			}
 			
-			if(parrot && line != null) {
-				byte[] bytes2 = new byte[snowboyData.length * 2];
-				ByteBuffer.wrap(bytes2).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(snowboyData);
-				line.write(bytes2, 0, bytes2.length);
-			}
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -146,9 +118,12 @@ public class WakewordProcessor implements AudioReceiveHandler {
 			writeShort(output, (short) 16); // bits per sample
 			writeString(output, "data"); // subchunk 2 id
 			writeInt(output, rawData.length); // subchunk 2 size
+			
+			byte[] wave = baos.toByteArray();
+			
 			// Audio data (conversion big endian -> little endian)
-			shorts = new short[rawData.length / 2];
-			ByteBuffer.wrap(rawData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+			shorts = new short[wave.length / 2];
+			ByteBuffer.wrap(wave).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
 			ByteBuffer bytes = ByteBuffer.allocate(shorts.length * 2);
 			for (short s : shorts) {
 				bytes.putShort(s);

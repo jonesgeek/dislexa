@@ -1,9 +1,11 @@
 discord:
   bot:
-    token: {YOUR_BOT_TOKEN}
     audio:
-#      parrot: true
 #      canReceive: true
+#      parrot: true
+    command:
+#      prefix: !
+    token: {YOUR_BOT_TOKEN}
     wakeword:
-#      sensitivity: 0.6
 #      audioGain: 1
+#      sensitivity: 0.6

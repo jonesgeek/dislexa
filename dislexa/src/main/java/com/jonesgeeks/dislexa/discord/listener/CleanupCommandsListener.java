@@ -27,8 +27,8 @@ public class CleanupCommandsListener extends CommandListener {
 	protected void doCommand(MessageReceivedEvent event) {
 		TextChannel channel = event.getTextChannel();
 		MessageHistory history = channel.getHistory();
-		history.retrievePast(100).complete().stream().filter(m -> m.getContent().startsWith("!") || 
-				m.getAuthor().isBot()).forEach(m -> m.delete().submit());
+		history.retrievePast(100).complete().stream().filter(m -> m.getContent().startsWith(getPrefix()) 
+				|| m.getAuthor().isBot()).forEach(m -> m.delete().submit());
 		sendTempMessage(channel, "Cleaned up commands and bot responses", 5_000);
 	}
 }

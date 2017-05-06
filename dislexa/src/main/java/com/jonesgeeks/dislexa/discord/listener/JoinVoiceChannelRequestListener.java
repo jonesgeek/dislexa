@@ -6,10 +6,10 @@ package com.jonesgeeks.dislexa.discord.listener;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.handle.audio.WakewordProcessor;
-
+import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.entities.GuildVoiceState;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
  */
 @Component
 public class JoinVoiceChannelRequestListener extends CommandListener {
-	private @Autowired WakewordProcessor hotwordProcessor;
+	private @Autowired @Qualifier("dislexaAudioReceiveHandler") AudioReceiveHandler audioHandler;
 	private final Pattern commandWord = Pattern.compile("join");
 
 	@Override
@@ -52,7 +52,7 @@ public class JoinVoiceChannelRequestListener extends CommandListener {
 				sendTempMessage(channel, ":poo: That room is full! :poo:", 10_000);
 			else {
 				AudioManager manager = voice.getGuild().getAudioManager();
-				manager.setReceivingHandler(hotwordProcessor);
+				manager.setReceivingHandler(audioHandler);
 				manager.openAudioConnection(voice);
 				sendTempMessage(channel, "Connected to **" + voice.getName() + "**.", 5_000);
 			}

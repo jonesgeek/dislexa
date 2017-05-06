@@ -29,7 +29,8 @@ import net.dv8tion.jda.core.hooks.EventListener;
  *
  */
 public abstract class CommandListener implements EventListener{
-	private @Value("${discord.bot.prefix:!}") String prefix;
+	private @Value("${discord.bot.command.prefix:!}") String prefix;
+
 	private @Autowired JDA client;
 	
 	public static final String BOTCOMMANDER_ROLE = "@botcommander";
@@ -70,8 +71,8 @@ public abstract class CommandListener implements EventListener{
 				String command = split[0].replaceFirst(prefix, "");
 				Matcher m = getMatchesPattern().matcher(command);
 				if (m.matches()) {
-					message.delete().submit();
 					doCommand(event);
+					message.delete().submit();
 				} 
 			}
 			
@@ -117,4 +118,33 @@ public abstract class CommandListener implements EventListener{
 	protected abstract Pattern getMatchesPattern();
 	
 	protected abstract void doCommand(MessageReceivedEvent event);
+	
+
+	/**
+	 * @return the prefix
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
+
+	/**
+	 * @param prefix the prefix to set
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	/**
+	 * @return the client
+	 */
+	public JDA getClient() {
+		return client;
+	}
+
+	/**
+	 * @param client the client to set
+	 */
+	public void setClient(JDA client) {
+		this.client = client;
+	}
 }
