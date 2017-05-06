@@ -1,6 +1,6 @@
-package com.jonesgeeks.dislexa.hotword;
+package com.jonesgeeks.dislexa.wakeword;
 
-public interface HotwordDetector {
+public interface WakewordDetector {
 
 	void delete();
 

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.hotword.HotwordDetector;
+import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.audio.CombinedAudio;
@@ -31,9 +31,9 @@ import net.dv8tion.jda.core.audio.UserAudio;
  *
  */
 @Component
-public class HotwordProcessor implements AudioReceiveHandler{
+public class WakewordProcessor implements AudioReceiveHandler {
 
-	private @Autowired HotwordDetector detector;
+	private @Autowired WakewordDetector detector;
 	
 	private @Value("${discord.bot.audio.parrot: false}") boolean parrot;
 	

@@ -10,10 +10,10 @@ package ai.kitt.snowboy;
 
 import java.io.IOException;
 
-import com.jonesgeeks.dislexa.hotword.HotwordDetector;
+import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 import com.jonesgeeks.util.NativeUtils;
 
-public class SnowboyDetect implements HotwordDetector {
+public class SnowboyDetect implements WakewordDetector {
 	static {
 		try {
 			NativeUtils.loadLibraryFromJar("/libsnowboy-detect-java.dylib");

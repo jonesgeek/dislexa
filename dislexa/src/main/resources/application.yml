@@ -4,6 +4,6 @@ discord:
     audio:
 #      parrot: true
 #      canReceive: true
-    hotword:
+    wakeword:
 #      sensitivity: 0.6
 #      audioGain: 1

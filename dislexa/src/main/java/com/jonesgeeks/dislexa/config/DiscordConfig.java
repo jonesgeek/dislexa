@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.hotword.HotwordDetector;
+import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
 import ai.kitt.snowboy.SnowboyDetect;
 import net.dv8tion.jda.core.AccountType;
@@ -44,10 +44,10 @@ public class DiscordConfig {
 	@Value("${discord.bot.token}")
 	private String token;
 
-	@Value("${discord.bot.hotword.sensitivity: 0.6}")
+	@Value("${discord.bot.wakeword.sensitivity: 0.6}")
 	private String hotwordSensitivity;
 	
-	@Value("${discord.bot.hotword.audioGain: 1}")
+	@Value("${discord.bot.wakeword.audioGain: 1}")
 	private float hotwordAudioGain;
 	
 	@Value("classpath:common.res")
@@ -64,7 +64,7 @@ public class DiscordConfig {
 	}
 	
 	@Bean
-	public HotwordDetector getHotwordDetector() throws IOException {
+	public WakewordDetector getHotwordDetector() throws IOException {
 		
 		SnowboyDetect detector = new SnowboyDetect(copyResourceToTemp(commonResource).getAbsolutePath(), 
 				copyResourceToTemp(modelResource).getAbsolutePath());

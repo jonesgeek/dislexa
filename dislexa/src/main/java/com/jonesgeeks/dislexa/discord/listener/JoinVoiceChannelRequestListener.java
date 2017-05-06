@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.handle.audio.HotwordProcessor;
+import com.jonesgeeks.dislexa.handle.audio.WakewordProcessor;
 
 import net.dv8tion.jda.core.entities.GuildVoiceState;
 import net.dv8tion.jda.core.entities.Member;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
  */
 @Component
 public class JoinVoiceChannelRequestListener extends CommandListener {
-	private @Autowired HotwordProcessor hotwordProcessor;
+	private @Autowired WakewordProcessor hotwordProcessor;
 	private final Pattern commandWord = Pattern.compile("join");
 
 	@Override
@@ -43,13 +43,13 @@ public class JoinVoiceChannelRequestListener extends CommandListener {
 		GuildVoiceState voiceState = member.getVoiceState();
 
 		if (!voiceState.inVoiceChannel())
-			sendTempMessage(channel, "You aren't in a voice channel!", 60_000);
+			sendTempMessage(channel, ":poo: You aren't in a voice channel! :poo:", 10_000);
 		else {
 			VoiceChannel voice = voiceState.getChannel();
 			//			if (!voice.getO.getModifiedPermissions(client.getSelfUser()).contains(Permissions.VOICE_CONNECT))
 			//				channel.sendMessage("I can't join that voice channel!");
 			if (voice.getUserLimit() != 0 && voice.getMembers().size() >= voice.getUserLimit())
-				sendTempMessage(channel, "That room is full!", 60_000);
+				sendTempMessage(channel, ":poo: That room is full! :poo:", 10_000);
 			else {
 				AudioManager manager = voice.getGuild().getAudioManager();
 				manager.setReceivingHandler(hotwordProcessor);
