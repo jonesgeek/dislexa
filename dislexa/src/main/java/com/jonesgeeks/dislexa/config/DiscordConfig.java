@@ -44,7 +44,7 @@ public class DiscordConfig {
 	@Value("${discord.bot.token}")
 	private String token;
 
-	@Value("${discord.bot.hotword.sensitivity: 0.5}")
+	@Value("${discord.bot.hotword.sensitivity: 0.6}")
 	private String hotwordSensitivity;
 	
 	@Value("${discord.bot.hotword.audioGain: 1}")
