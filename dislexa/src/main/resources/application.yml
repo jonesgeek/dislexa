@@ -1,8 +1,7 @@
 discord:
   bot:
     audio:
-#      canReceive: true
-#      parrot: true
+#      outputToSpeaker: false
     command:
 #      prefix: !
     token: {YOUR_BOT_TOKEN}

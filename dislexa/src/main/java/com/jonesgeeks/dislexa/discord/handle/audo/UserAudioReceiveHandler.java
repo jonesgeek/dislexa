@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jonesgeeks.dislexa.handle.audio;
+package com.jonesgeeks.dislexa.discord.handle.audo;
 
 import com.jonesgeeks.util.Streamable;
 

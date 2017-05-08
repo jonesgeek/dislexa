@@ -1,7 +1,9 @@
 /**
  * 
  */
-package com.jonesgeeks.dislexa.handle.audio.processor;
+package com.jonesgeeks.dislexa.discord.handle.audo.processor;
+
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -14,19 +16,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.handle.audio.UserAudioReceiveHandler;
-import com.jonesgeeks.dislexa.handle.audio.converter.AudioConverter;
+import com.jonesgeeks.dislexa.discord.handle.audo.UserAudioReceiveHandler;
+
+import net.dv8tion.jda.core.audio.UserAudio;
 
 /**
  *
  */
-@Component
+//@Component
 public class OutputToSpeakerProcessor {
 	private @Autowired UserAudioReceiveHandler userAudioHandler;
-	private @Autowired AudioConverter audioConverter;
 	private @Value("${discord.bot.audio.outputToSpeaker: false}") boolean outputToSpeaker;
 
 	private SourceDataLine line;
+	
+	private Stream<UserAudio> stream;
+	
+	private Thread t;
 	
 	@PostConstruct
 	public void init() throws LineUnavailableException {
@@ -36,27 +42,32 @@ public class OutputToSpeakerProcessor {
 			line.open();
 			line.start();
 			
-			userAudioHandler.stream().forEach(audio -> {
-				byte[] pcm = audio.getAudioData(1.0);
-				try {
-					byte[] wave = audioConverter.pcmToWave(pcm, 
-							(int) UserAudioReceiveHandler.OUTPUT_FORMAT.getSampleRate(), 
-							UserAudioReceiveHandler.OUTPUT_FORMAT.getChannels(),
-							UserAudioReceiveHandler.OUTPUT_FORMAT.getSampleSizeInBits());
-					line.write(wave, 0, wave.length);
-				} catch (Exception e) {
-					e.printStackTrace();
+			stream = userAudioHandler.stream();
+			t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					stream.forEach(audio -> {
+						byte[] pcm = audio.getAudioData(1.0);
+						line.write(pcm, 0, pcm.length);
+					});
 				}
 			});
+			t.start();
+			
 		}
 	}
 
 	@PreDestroy
 	public void close() {
-		if(outputToSpeaker && line != null) {
-			line.drain();
-			line.close();
-			line = null;
+		if(outputToSpeaker) {
+			if(line != null) {
+				line.drain();
+				line.close();
+				line = null;
+			}
+			userAudioHandler.disconnect(stream);
+			
+			t.interrupt();
 		}
 	}
 }

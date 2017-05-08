@@ -6,10 +6,10 @@ package com.jonesgeeks.dislexa.discord.listener;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import net.dv8tion.jda.core.audio.AudioReceiveHandler;
+import com.jonesgeeks.dislexa.discord.handle.audo.UserAudioReceiveHandler;
+
 import net.dv8tion.jda.core.entities.GuildVoiceState;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
  */
 @Component
 public class JoinVoiceChannelRequestListener extends CommandListener {
-	private @Autowired @Qualifier("dislexaAudioReceiveHandler") AudioReceiveHandler audioHandler;
+	private @Autowired UserAudioReceiveHandler audioHandler;
 	private final Pattern commandWord = Pattern.compile("join");
 
 	@Override

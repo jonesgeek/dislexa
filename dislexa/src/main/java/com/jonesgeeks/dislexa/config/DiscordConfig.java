@@ -9,17 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.annotation.PostConstruct;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
@@ -27,26 +24,22 @@ import ai.kitt.snowboy.SnowboyDetect;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 /**
- * @author will
  *
  */
 @Configuration
-@ComponentScan("com.jonesgeeks.dislexa.discord")
 public class DiscordConfig {
 	
 	@Value("${discord.bot.token}")
 	private String token;
 
 	@Value("${discord.bot.wakeword.sensitivity: 0.6}")
-	private String hotwordSensitivity;
+	private String wakewordSensitivity;
 	
 	@Value("${discord.bot.wakeword.audioGain: 1}")
-	private float hotwordAudioGain;
+	private float wakewordAudioGain;
 	
 	@Value("classpath:common.res")
     private Resource commonResource;
@@ -56,18 +49,18 @@ public class DiscordConfig {
 	
 
 	@Bean(destroyMethod="shutdown")
-	public JDA getDiscordClient() throws LoginException, IllegalArgumentException, RateLimitedException {
+	public JDA jda() throws LoginException, IllegalArgumentException, RateLimitedException {
 		JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildAsync();
 		return jda;
 	}
 	
 	@Bean
-	public WakewordDetector getHotwordDetector() throws IOException {
-		
+	public WakewordDetector wakewordDetector() throws IOException {
 		SnowboyDetect detector = new SnowboyDetect(copyResourceToTemp(commonResource).getAbsolutePath(), 
 				copyResourceToTemp(modelResource).getAbsolutePath());
-		detector.SetSensitivity(hotwordSensitivity);
-	    detector.SetAudioGain(hotwordAudioGain);
+		detector.SetSensitivity(wakewordSensitivity);
+	    detector.SetAudioGain(wakewordAudioGain);
+	    System.out.println("Wakeword Detector initialized");
 	    return detector;
 	}
 	
@@ -84,28 +77,6 @@ public class DiscordConfig {
 		} finally {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
-		}
-	}
-	
-	/**
-	 * Event listener to let us know that the bot is ready
-	 */
-	@Component
-	class BotReadyListener extends ListenerAdapter{
-		private @Autowired JDA jda;
-		
-		@PostConstruct
-		private void init() {
-			jda.addEventListener(this);
-		}
-		/*
-		 * (non-Javadoc)
-		 * @see net.dv8tion.jda.core.hooks.EventListener#onEvent(net.dv8tion.jda.core.events.Event)
-		 */
-		@Override
-		public void onReady(ReadyEvent event) {
-			System.out.println("Dislexa is now ready!");
-			jda.removeEventListener(this);
 		}
 	}
 }
