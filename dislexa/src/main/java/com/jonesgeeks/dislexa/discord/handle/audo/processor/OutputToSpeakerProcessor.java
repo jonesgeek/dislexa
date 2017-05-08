@@ -33,6 +33,7 @@ public class OutputToSpeakerProcessor {
 	private Stream<UserAudio> stream;
 	
 	private Thread t;
+	private boolean cancelled = false;
 	
 	@PostConstruct
 	public void init() throws LineUnavailableException {
@@ -46,9 +47,10 @@ public class OutputToSpeakerProcessor {
 			t = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					stream.forEach(audio -> {
+					stream.filter(audio -> {
 						byte[] pcm = audio.getAudioData(1.0);
 						line.write(pcm, 0, pcm.length);
+						return cancelled;
 					});
 				}
 			});
@@ -66,8 +68,7 @@ public class OutputToSpeakerProcessor {
 				line = null;
 			}
 			userAudioHandler.disconnect(stream);
-			
-			t.interrupt();
+			cancelled = true;
 		}
 	}
 }
