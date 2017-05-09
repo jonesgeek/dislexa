@@ -4,13 +4,20 @@
 package com.jonesgeeks.dislexa.discord.handle.audo;
 
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaListenFilter;
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaOutputToVoiceChannel;
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.AudioDownsamplerConsumer;
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.OutputToSpeakerConsumer;
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.WakewordConsumer;
+
 import cyclops.async.Queue;
-import cyclops.async.Topic;
-import cyclops.stream.ReactiveSeq;
 import net.dv8tion.jda.core.audio.UserAudio;
 
 /**
@@ -18,8 +25,14 @@ import net.dv8tion.jda.core.audio.UserAudio;
  */
 @Component
 public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
+	private @Autowired AudioDownsamplerConsumer downsampler;
+	private @Autowired OutputToSpeakerConsumer outputToSpeaker;
+	private @Autowired WakewordConsumer wakeword;
+	private @Autowired AlexaListenFilter alexaListen;
+	private @Autowired AlexaOutputToVoiceChannel alexaRespond;
+
 	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<UserAudio>(1));
-	private Topic<UserAudio> userAudioTopic = new Topic<>(audioQueue);
+	private Thread t;
 
 	/* (non-Javadoc)
 	 * @see net.dv8tion.jda.core.audio.AudioReceiveHandler#handleUserAudio(net.dv8tion.jda.core.audio.UserAudio)
@@ -31,23 +44,29 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 			audioQueue.add(userAudio);
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.jonesgeeks.util.Streamable#stream()
-	 */
-	@Override
-	public ReactiveSeq<UserAudio> stream() {
-		return userAudioTopic.stream();
+
+	@PostConstruct
+	public void init() {
+		t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				audioQueue.stream()
+//				.map(downsampler)
+				.filter(audio -> audio != null)
+				.peek(outputToSpeaker)
+				.peek(wakeword)
+				.filter(alexaListen)
+				.forEach(alexaRespond);
+			}
+		});
+		t.start();
+
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.jonesgeeks.util.Streamable#disconnect(java.util.stream.Stream)
-	 */
-	@Override
-	public void disconnect(Stream<UserAudio> stream) {
-		userAudioTopic.disconnect(stream);
+
+	@PreDestroy
+	public void close() {
+		audioQueue.closeAndClear();
 	}
 
 }

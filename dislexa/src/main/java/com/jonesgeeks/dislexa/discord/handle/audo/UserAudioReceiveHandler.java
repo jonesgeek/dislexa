@@ -3,16 +3,13 @@
  */
 package com.jonesgeeks.dislexa.discord.handle.audo;
 
-import com.jonesgeeks.util.Streamable;
-
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.audio.CombinedAudio;
-import net.dv8tion.jda.core.audio.UserAudio;
 
 /**
  *
  */
-public interface UserAudioReceiveHandler extends AudioReceiveHandler, Streamable<UserAudio> {
+public interface UserAudioReceiveHandler extends AudioReceiveHandler {
 
 	/* (non-Javadoc)
 	 * @see net.dv8tion.jda.core.audio.AudioReceiveHandler#canReceiveUser()

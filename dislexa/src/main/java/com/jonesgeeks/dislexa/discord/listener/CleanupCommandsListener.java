@@ -27,8 +27,13 @@ public class CleanupCommandsListener extends CommandListener {
 	protected void doCommand(MessageReceivedEvent event) {
 		TextChannel channel = event.getTextChannel();
 		MessageHistory history = channel.getHistory();
-		history.retrievePast(100).complete().stream().filter(m -> m.getContent().startsWith(getPrefix()) 
-				|| m.getAuthor().isBot()).forEach(m -> m.delete().submit());
+		String[] split = event.getMessage().getContent().split(" ");
+		if(split[1] != null && split[1].matches("\\d*")) {
+			history.retrievePast(Integer.valueOf(split[1])).complete().stream().forEach(m -> m.delete().submit());
+		} else {
+			history.retrievePast(100).complete().stream().filter(m -> m.getContent().startsWith(getPrefix()) 
+					|| m.getAuthor().isBot()).forEach(m -> m.delete().submit());
+		}
 		sendTempMessage(channel, "Cleaned up commands and bot responses", 5_000);
 	}
 }
