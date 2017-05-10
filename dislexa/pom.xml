@@ -35,6 +35,11 @@
 			<artifactId>JDA</artifactId>
 			<version>3.0.0_157</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>3.0.3</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -51,7 +56,6 @@
 		    <artifactId>cyclops-react</artifactId>
 		    <version>2.0.0-MI5</version>
 		</dependency>
-
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -81,5 +81,11 @@ public class AudioDownsamplerConsumer implements UnaryOperator<UserAudio> {
 		ByteBuffer.wrap(rawData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
 		return shorts;
 	}
+	
+	public static byte[] convertToLittleEndian(byte[] rawData) {
+		byte[] bytes = new byte[rawData.length];
+		ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).put(rawData);
+		return bytes;
+	}
 
 }
