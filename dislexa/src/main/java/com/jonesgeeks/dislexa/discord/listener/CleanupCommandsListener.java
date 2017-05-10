@@ -28,7 +28,7 @@ public class CleanupCommandsListener extends CommandListener {
 		TextChannel channel = event.getTextChannel();
 		MessageHistory history = channel.getHistory();
 		String[] split = event.getMessage().getContent().split(" ");
-		if(split[1] != null && split[1].matches("\\d*")) {
+		if(split.length > 1 && split[1].matches("\\d*")) {
 			history.retrievePast(Integer.valueOf(split[1])).complete().stream().forEach(m -> m.delete().submit());
 		} else {
 			history.retrievePast(100).complete().stream().filter(m -> m.getContent().startsWith(getPrefix()) 

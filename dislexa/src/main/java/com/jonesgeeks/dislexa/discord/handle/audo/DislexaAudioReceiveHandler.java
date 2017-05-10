@@ -31,8 +31,7 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	private @Autowired AlexaListenFilter alexaListen;
 	private @Autowired AlexaOutputToVoiceChannel alexaRespond;
 
-	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<UserAudio>(1));
-	private Thread t;
+	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<UserAudio>(50));
 
 	/* (non-Javadoc)
 	 * @see net.dv8tion.jda.core.audio.AudioReceiveHandler#handleUserAudio(net.dv8tion.jda.core.audio.UserAudio)
@@ -40,27 +39,23 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	@Override
 	public void handleUserAudio(UserAudio userAudio) {
 		if(!userAudio.getUser().isBot() && !audioQueue.add(userAudio)) {
-			audioQueue.get(); //Pull off the current audio and add a new one.
-			audioQueue.add(userAudio);
+			System.out.println("audioQueue too slow, trying message one more time: " +
+					audioQueue.add(userAudio));
 		}
 	}
 
 	@PostConstruct
 	public void init() {
-		t = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				audioQueue.stream()
-//				.map(downsampler)
-				.filter(audio -> audio != null)
-				.peek(outputToSpeaker)
+		
+		new Thread(() -> {
+			audioQueue.stream()
+				.map(downsampler)
+//				.filter(audio -> audio == null)
+//				.peek(outputToSpeaker)
 				.peek(wakeword)
-				.filter(alexaListen)
+//				.filter(alexaListen)
 				.forEach(alexaRespond);
-			}
-		});
-		t.start();
+		}).start();
 
 	}
 

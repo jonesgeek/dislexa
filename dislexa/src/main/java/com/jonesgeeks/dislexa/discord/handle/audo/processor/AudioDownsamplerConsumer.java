@@ -8,10 +8,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.function.UnaryOperator;
 
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
@@ -26,8 +28,14 @@ import net.dv8tion.jda.core.audio.UserAudio;
  */
 @Component
 public class AudioDownsamplerConsumer implements UnaryOperator<UserAudio> {
-	public static final AudioFormat DOWNSAMPLED_AUDIO_FORMAT = 
-			new AudioFormat(16000, 16, 1, true, false);
+	public static final AudioFormat DOWNSAMPLED_AUDIO_FORMAT = new AudioFormat(
+					Encoding.PCM_SIGNED,
+					16000,
+					16,
+					1,
+					2,
+					16000,
+					false);
 
 	@Override
 	public UserAudio apply(UserAudio audio) {
@@ -48,21 +56,24 @@ public class AudioDownsamplerConsumer implements UnaryOperator<UserAudio> {
 			throws IOException {
 		byte[] converted = null;
 		AudioInputStream sourceStream = null;
-		AudioInputStream convertedStream = null;
+		AudioInputStream targetStream = null;
 		ByteArrayOutputStream out = null;
 		try {
 			sourceStream = new AudioInputStream(new ByteArrayInputStream(source), sourceFormat, 
 					source.length);
+			
+			targetStream = AudioSystem.getAudioInputStream(DOWNSAMPLED_AUDIO_FORMAT, sourceStream);
 			out = new ByteArrayOutputStream();
-			AudioSystem.write(sourceStream, Type.WAVE, out);
+
+			AudioSystem.write(targetStream, Type.AU, out);
 			converted = out.toByteArray();
-	        System.out.println("initial size: " + source.length + " converted size: " + converted.length);
 		} finally {
 			IOUtils.closeQuietly(sourceStream);
-			IOUtils.closeQuietly(convertedStream);
+			IOUtils.closeQuietly(targetStream);
 			IOUtils.closeQuietly(out);
 		}
-		return converted;
+		// 24 is AU header length
+		return Arrays.copyOfRange(converted, 24, converted.length);
 	}
 	
 	public static short[] convertToShortArray(byte[] rawData) {
