@@ -85,7 +85,7 @@ public class Decoder
         if (result < 0)
             return null;
 
-        short[] audio = new short[result * 2];
+        short[] audio = new short[result];
         decoded.get(audio);
         return audio;
     }

@@ -44,7 +44,7 @@ public class DiscordConfig {
 	@Value("classpath:common.res")
     private Resource commonResource;
 	
-	@Value("classpath:alexa.umdl")
+	@Value("classpath:Kirby.pmdl")
     private Resource modelResource;
 	
 

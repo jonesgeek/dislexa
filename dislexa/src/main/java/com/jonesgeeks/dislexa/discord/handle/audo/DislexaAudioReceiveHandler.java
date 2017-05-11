@@ -8,14 +8,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaListenFilter;
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaOutputToVoiceChannel;
-import com.jonesgeeks.dislexa.discord.handle.audo.processor.AudioDownsamplerConsumer;
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.OutputToSpeakerConsumer;
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.WakewordConsumer;
 
@@ -32,7 +30,6 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
      */
     public static final AudioFormat DOWNSAMPLED_AUDIO_FORMAT = new AudioFormat(16000.0f, 16, 1, true, true);
     
-	private @Autowired AudioDownsamplerConsumer downsampler;
 	private @Autowired OutputToSpeakerConsumer outputToSpeaker;
 	private @Autowired WakewordConsumer wakeword;
 	private @Autowired AlexaListenFilter alexaListen;
@@ -56,10 +53,8 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 		
 		new Thread(() -> {
 			audioQueue.stream()
-//				.map(downsampler)
-//				.filter(audio -> audio == null)
-				.peek(outputToSpeaker)
-//				.peek(wakeword)
+				.peek(wakeword)
+//				.peek(outputToSpeaker)
 //				.filter(alexaListen)
 				.forEach(alexaRespond);
 		}).start();
