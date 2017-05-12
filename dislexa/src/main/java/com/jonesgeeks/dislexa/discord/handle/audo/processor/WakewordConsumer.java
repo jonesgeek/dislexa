@@ -7,16 +7,16 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.function.Consumer;
 
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.hooks.IEventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.discord.events.wakeword.WakewordDetectedEvent;
+import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
 import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.UserAudio;
 import net.dv8tion.jda.core.entities.impl.JDAImpl;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  *
@@ -24,8 +24,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 @Component
 public class WakewordConsumer implements Consumer<UserAudio>{
 	private @Autowired WakewordDetector wakewordDetector;
-	private @Autowired AlexaListenFilter alexaListenFilter;
-	private @Autowired JDAImpl api;
+	private @Autowired JDA api;
+	private @Autowired IEventManager eventManager;
 
 	/*
 	 * (non-Javadoc)
@@ -37,8 +37,7 @@ public class WakewordConsumer implements Consumer<UserAudio>{
 		short[] snowboyData = convertToShortArray(pcm);
 		int result = wakewordDetector.RunDetection(snowboyData, snowboyData.length);
 		if (result > 0) {
-			api.getEventManager().handle(
-	                new WakewordDetectedEvent(api, audio.getUser()));
+			eventManager.handle(new WakewordDetectedEvent(api, audio.getUser()));
 		}
 	}
 

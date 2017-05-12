@@ -30,20 +30,8 @@ import net.dv8tion.jda.core.hooks.EventListener;
  */
 public abstract class CommandListener implements EventListener{
 	private @Value("${discord.bot.command.prefix:!}") String prefix;
-
-	private @Autowired JDA client;
 	
 	public static final String BOTCOMMANDER_ROLE = "@botcommander";
-	
-	@PostConstruct
-	private void init() {
-		if(client != null) {
-			client.addEventListener(this);
-			System.out.println("Registered listener " + this.getClass().getName());
-		} else {
-			System.out.println("Could not register listener " + this.getClass().getName() + ", discord client is null.");
-		}
-	}
 	
 	@Override
 	public void onEvent(Event event) {
@@ -132,19 +120,5 @@ public abstract class CommandListener implements EventListener{
 	 */
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
-	}
-
-	/**
-	 * @return the client
-	 */
-	public JDA getClient() {
-		return client;
-	}
-
-	/**
-	 * @param client the client to set
-	 */
-	public void setClient(JDA client) {
-		this.client = client;
 	}
 }

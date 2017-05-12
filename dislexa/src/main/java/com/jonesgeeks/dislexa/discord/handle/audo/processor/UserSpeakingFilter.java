@@ -7,43 +7,36 @@ import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 
+import com.jonesgeeks.dislexa.discord.events.UserSpeakingEvent;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.audio.hooks.ConnectionListener;
+import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.impl.JDAImpl;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.hooks.EventListener;
 
+import net.dv8tion.jda.core.hooks.IEventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.discord.events.wakeword.WakewordDetectedEvent;
+import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
 
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.UserAudio;
 
 /**
  * TODO: Implement this
  */
 @Component
-public class AlexaListenFilter implements Predicate<UserAudio>, EventListener {
+public class UserSpeakingFilter implements Predicate<UserAudio>, EventListener, ConnectionListener {
 	private @Autowired JDA api;
-	
-	@PostConstruct
-	public void init() {
-		api.addEventListener(this);
-	}
+	private @Autowired IEventManager eventManager;
 
     private User speakingUser = null;
 
-    public User getSpeakingUser() {
-        return speakingUser;
-    }
-
-    public void setSpeakingUser(User speakingUser) {
-        this.speakingUser = speakingUser;
-    }
-
     /* (non-Javadoc)
      * @see java.util.function.Predicate#test(java.lang.Object)
-             */
+     */
 	@Override
 	public boolean test(UserAudio audio) {
 		return audio.getUser().equals(speakingUser);
@@ -56,12 +49,29 @@ public class AlexaListenFilter implements Predicate<UserAudio>, EventListener {
 	@Override
 	public void onEvent(Event event) {
 		if (event instanceof WakewordDetectedEvent) {
-			if( speakingUser == null ) {
+			if ( speakingUser == null ) {
 				speakingUser = ((WakewordDetectedEvent)event).getUser();
+				eventManager.handle(new UserSpeakingEvent(api, speakingUser, true));
 			}
 			System.out.println("Wakeword detected");
 		}
 		
 	}
 
+	@Override
+	public void onUserSpeaking(User user, boolean speaking) {
+		System.out.println("user "  + user.getName() + (!speaking ? " stopped" : "") + " speaking");
+		if ( !speaking && user.equals(speakingUser) ) {
+			speakingUser = null;
+			eventManager.handle(new UserSpeakingEvent(api, user, false));
+		}
+	}
+
+	@Override
+	public void onStatusChange(ConnectionStatus connectionStatus) {
+	}
+
+	@Override
+	public void onPing(long l) {
+	}
 }

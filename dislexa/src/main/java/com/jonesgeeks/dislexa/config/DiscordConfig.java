@@ -8,13 +8,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.core.hooks.EventListener;
+import net.dv8tion.jda.core.hooks.IEventManager;
+import net.dv8tion.jda.core.hooks.InterfacedEventManager;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
@@ -46,11 +51,23 @@ public class DiscordConfig {
 	
 	@Value("classpath:Kirby.pmdl")
     private Resource modelResource;
-	
+
+
+	private @Autowired IEventManager eventManager;
+	private @Autowired List<EventListener> eventListeners;
+
+
+    @Bean
+	public IEventManager eventManager() {
+		return new InterfacedEventManager();
+	}
 
 	@Bean(destroyMethod="shutdown")
-	public JDA jda() throws LoginException, IllegalArgumentException, RateLimitedException {
-		JDA jda = new JDABuilder(AccountType.BOT).setToken(token).buildAsync();
+	public JDA jda(IEventManager eventManager) throws LoginException, IllegalArgumentException, RateLimitedException {
+		JDA jda = new JDABuilder(AccountType.BOT)
+				.setToken(token)
+				.setEventManager(eventManager)
+				.buildAsync();
 		return jda;
 	}
 	
@@ -62,6 +79,13 @@ public class DiscordConfig {
 	    detector.SetAudioGain(wakewordAudioGain);
 	    System.out.println("Wakeword Detector for model " + modelResource.getFilename() + " initialized");
 	    return detector;
+	}
+
+	@PostConstruct
+	public void init() {
+		for (EventListener eventListener : eventListeners) {
+			eventManager.register(eventListener);
+		}
 	}
 	
 	private File copyResourceToTemp(Resource r) throws IOException {
