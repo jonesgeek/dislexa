@@ -29,6 +29,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.neovisionaries</groupId>
+			<artifactId>nv-websocket-client</artifactId>
+			<version>1.30</version>
+		</dependency>
 
 		<dependency>
 			<groupId>net.dv8tion</groupId>

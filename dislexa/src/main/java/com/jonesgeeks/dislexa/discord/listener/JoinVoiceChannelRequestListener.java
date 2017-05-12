@@ -23,6 +23,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
 @Component
 public class JoinVoiceChannelRequestListener extends CommandListener {
 	private @Autowired UserAudioReceiveHandler audioHandler;
+	private @Autowired UserStoppedSpeakingListener userStoppedSpeakingListener;
 	private final Pattern commandWord = Pattern.compile("join");
 
 	@Override
@@ -53,6 +54,7 @@ public class JoinVoiceChannelRequestListener extends CommandListener {
 			else {
 				AudioManager manager = voice.getGuild().getAudioManager();
 				manager.setReceivingHandler(audioHandler);
+				manager.setConnectionListener(userStoppedSpeakingListener);
 				manager.openAudioConnection(voice);
 				sendTempMessage(channel, "Connected to **" + voice.getName() + "**.", 5_000);
 			}

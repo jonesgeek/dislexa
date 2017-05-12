@@ -20,6 +20,7 @@ import net.dv8tion.jda.core.audio.UserAudio;
 @Component
 public class WakewordConsumer implements Consumer<UserAudio>{
 	private @Autowired WakewordDetector wakewordDetector;
+	private @Autowired AlexaListenFilter alexaListenFilter;
 
 	/*
 	 * (non-Javadoc)
@@ -31,6 +32,9 @@ public class WakewordConsumer implements Consumer<UserAudio>{
 		short[] snowboyData = convertToShortArray(pcm);
 		int result = wakewordDetector.RunDetection(snowboyData, snowboyData.length);
 		if (result > 0) {
+			if (alexaListenFilter.getSpeakingUser() == null) {
+				alexaListenFilter.setSpeakingUser(audio.getUser());
+			}
 			System.out.print("wakeword " + result + " detected!\n");
 		}
 	}

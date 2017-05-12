@@ -35,7 +35,7 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	private @Autowired AlexaListenFilter alexaListen;
 	private @Autowired AlexaOutputToVoiceChannel alexaRespond;
 
-	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<UserAudio>(50));
+	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<>(50));
 
 	/* (non-Javadoc)
 	 * @see net.dv8tion.jda.core.audio.AudioReceiveHandler#handleUserAudio(net.dv8tion.jda.core.audio.UserAudio)
@@ -55,8 +55,8 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 			audioQueue.stream()
 				.peek(wakeword)
 //				.peek(outputToSpeaker)
-//				.filter(alexaListen)
-				.forEach(alexaRespond);
+				.filter(alexaListen)
+				.forEach(outputToSpeaker);
 		}).start();
 
 	}

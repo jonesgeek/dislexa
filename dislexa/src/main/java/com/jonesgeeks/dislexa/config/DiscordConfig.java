@@ -60,7 +60,7 @@ public class DiscordConfig {
 				copyResourceToTemp(modelResource).getAbsolutePath());
 		detector.SetSensitivity(wakewordSensitivity);
 	    detector.SetAudioGain(wakewordAudioGain);
-	    System.out.println("Wakeword Detector initialized");
+	    System.out.println("Wakeword Detector for model " + modelResource.getFilename() + " initialized");
 	    return detector;
 	}
 	
