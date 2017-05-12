@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.discord.handle.audo.DislexaAudioReceiveHandler;
-
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.audio.UserAudio;
 
@@ -31,10 +29,16 @@ public class OutputToSpeakerConsumer implements Consumer<UserAudio>{
 
 	private SourceDataLine line;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.util.function.Consumer#accept(java.lang.Object)
+	 */
 	@Override
 	public void accept(UserAudio audio) {
-		byte[] pcm = audio.getAudioData(1.0);
-		line.write(pcm, 0, pcm.length);
+		if(outputToSpeaker) {
+			byte[] pcm = audio.getAudioData(1.0);
+			line.write(pcm, 0, pcm.length);
+		}
 	}
 	
 	@PostConstruct

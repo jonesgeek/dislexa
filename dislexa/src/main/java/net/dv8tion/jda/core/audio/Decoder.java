@@ -31,6 +31,7 @@ public class Decoder
     protected char lastSeq;
     protected int lastTimestamp;
     protected PointerByReference opusDecoder;
+    private final int channels;
 
     protected Decoder(int ssrc)
     {
@@ -42,6 +43,7 @@ public class Decoder
         this.ssrc = ssrc;
         this.lastSeq = (char) -1;
         this.lastTimestamp = -1;
+        this.channels = channel;
 
         IntBuffer error = IntBuffer.allocate(4);
         opusDecoder = Opus.INSTANCE.opus_decoder_create(srate, channel, error);
@@ -85,7 +87,7 @@ public class Decoder
         if (result < 0)
             return null;
 
-        short[] audio = new short[result];
+        short[] audio = new short[result * channels]; // not sure if the channel is the correlation, but it works
         decoded.get(audio);
         return audio;
     }

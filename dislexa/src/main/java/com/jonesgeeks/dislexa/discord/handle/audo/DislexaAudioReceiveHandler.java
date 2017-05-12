@@ -35,35 +35,51 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	private @Autowired AlexaListenFilter alexaListen;
 	private @Autowired AlexaOutputToVoiceChannel alexaRespond;
 
+	// Queue that all audio is put on, perform wakeword detection, then filter what goes on alexaQueue
 	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<>(50));
+	// Queue that alexa will be listening to.
+	private Queue<UserAudio> alexaQueue = new Queue<>(new ArrayBlockingQueue<>(50));
 
 	/* (non-Javadoc)
 	 * @see net.dv8tion.jda.core.audio.AudioReceiveHandler#handleUserAudio(net.dv8tion.jda.core.audio.UserAudio)
 	 */
 	@Override
 	public void handleUserAudio(UserAudio userAudio) {
-		if(!userAudio.getUser().isBot() && !audioQueue.add(userAudio)) {
-			System.out.println("audioQueue too slow, trying message one more time: " +
-					audioQueue.add(userAudio));
+		if(!userAudio.getUser().isBot()) {
+			addToQueue(userAudio, audioQueue, "audioQueue");
 		}
 	}
 
 	@PostConstruct
 	public void init() {
-		
+		// Thread for processing wakeword and determining if alexa should be interested
 		new Thread(() -> {
 			audioQueue.stream()
 				.peek(wakeword)
-//				.peek(outputToSpeaker)
 				.filter(alexaListen)
+				.forEach(audio -> { addToQueue(audio, alexaQueue, "alexaQueue"); });
+		}).start();
+		
+		// Thread for processing alexa-interesting audio so that the back-pressure doesn't affect 
+		// the wakeword processing
+		new Thread(() -> {
+			alexaQueue.stream()
 				.forEach(outputToSpeaker);
 		}).start();
 
+	}
+	
+	protected void addToQueue(UserAudio audio, Queue<UserAudio> queue, String queueName) {
+		if(!queue.add(audio)) {
+			System.out.println(queueName + " too slow, trying message one more time: " +
+					queue.add(audio));
+		}
 	}
 
 	@PreDestroy
 	public void close() {
 		audioQueue.closeAndClear();
+		alexaQueue.closeAndClear();
 	}
 
 	/* (non-Javadoc)

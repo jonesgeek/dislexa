@@ -10,9 +10,13 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.jonesgeeks.dislexa.discord.events.wakeword.WakewordDetectedEvent;
 import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.UserAudio;
+import net.dv8tion.jda.core.entities.impl.JDAImpl;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 /**
  *
@@ -21,6 +25,7 @@ import net.dv8tion.jda.core.audio.UserAudio;
 public class WakewordConsumer implements Consumer<UserAudio>{
 	private @Autowired WakewordDetector wakewordDetector;
 	private @Autowired AlexaListenFilter alexaListenFilter;
+	private @Autowired JDAImpl api;
 
 	/*
 	 * (non-Javadoc)
@@ -32,10 +37,8 @@ public class WakewordConsumer implements Consumer<UserAudio>{
 		short[] snowboyData = convertToShortArray(pcm);
 		int result = wakewordDetector.RunDetection(snowboyData, snowboyData.length);
 		if (result > 0) {
-			if (alexaListenFilter.getSpeakingUser() == null) {
-				alexaListenFilter.setSpeakingUser(audio.getUser());
-			}
-			System.out.print("wakeword " + result + " detected!\n");
+			api.getEventManager().handle(
+	                new WakewordDetectedEvent(api, audio.getUser()));
 		}
 	}
 
