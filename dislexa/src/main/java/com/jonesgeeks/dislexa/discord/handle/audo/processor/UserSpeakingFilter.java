@@ -50,17 +50,15 @@ public class UserSpeakingFilter implements Predicate<UserAudio>, EventListener, 
 	public void onEvent(Event event) {
 		if (event instanceof WakewordDetectedEvent) {
 			if ( speakingUser == null ) {
-				speakingUser = ((WakewordDetectedEvent)event).getUser();
-				eventManager.handle(new UserSpeakingEvent(api, speakingUser, true));
-			}
-			System.out.println("Wakeword detected");
+                speakingUser = ((WakewordDetectedEvent) event).getUser();
+                eventManager.handle(new UserSpeakingEvent(api, speakingUser, true));
+            }
 		}
 		
 	}
 
 	@Override
 	public void onUserSpeaking(User user, boolean speaking) {
-		System.out.println("user "  + user.getName() + (!speaking ? " stopped" : "") + " speaking");
 		if ( !speaking && user.equals(speakingUser) ) {
 			speakingUser = null;
 			eventManager.handle(new UserSpeakingEvent(api, user, false));
