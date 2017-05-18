@@ -4,7 +4,6 @@
 package com.jonesgeeks.dislexa.discord.handle.audo.processor;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.core.JDA;
@@ -16,7 +15,6 @@ import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
 import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
 import net.dv8tion.jda.core.audio.UserAudio;
-import net.dv8tion.jda.core.entities.impl.JDAImpl;
 
 /**
  *
@@ -43,7 +41,7 @@ public class WakewordConsumer implements Consumer<UserAudio>{
 
 	public short[] convertToShortArray(byte[] rawData) {
 		short[] shorts = new short[rawData.length / 2];
-		ByteBuffer.wrap(rawData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+		ByteBuffer.wrap(rawData).asShortBuffer().get(shorts);
 		return shorts;
 	}
 }

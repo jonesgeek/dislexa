@@ -45,7 +45,6 @@ public class OutputToSpeakerConsumer implements Consumer<UserAudio>{
 	public void init() throws LineUnavailableException {
 		if(outputToSpeaker) {
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioHandler.getFormat());
-//			DataLine.Info info = new DataLine.Info(SourceDataLine.class, AudioReceiveHandler.OUTPUT_FORMAT);
 			line = (SourceDataLine) AudioSystem.getLine(info);
 			line.open();
 			line.start();
