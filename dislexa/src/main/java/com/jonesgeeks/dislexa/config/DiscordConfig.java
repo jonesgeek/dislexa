@@ -40,7 +40,7 @@ public class DiscordConfig {
 	@Value("${discord.bot.token}")
 	private String token;
 
-	@Value("${discord.bot.wakeword.sensitivity: 0.6}")
+	@Value("${discord.bot.wakeword.sensitivity: 0.5}")
 	private String wakewordSensitivity;
 	
 	@Value("${discord.bot.wakeword.audioGain: 1}")

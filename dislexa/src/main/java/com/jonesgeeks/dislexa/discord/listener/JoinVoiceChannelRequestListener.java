@@ -3,20 +3,17 @@
  */
 package com.jonesgeeks.dislexa.discord.listener;
 
-import java.util.regex.Pattern;
-
-import com.jonesgeeks.dislexa.discord.handle.audo.processor.UserSpeakingFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.jonesgeeks.dislexa.discord.handle.audo.UserAudioReceiveHandler;
-
 import net.dv8tion.jda.core.entities.GuildVoiceState;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.managers.AudioManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.regex.Pattern;
 
 /**
  *
@@ -24,7 +21,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
 @Component
 public class JoinVoiceChannelRequestListener extends CommandListener {
 	private @Autowired UserAudioReceiveHandler audioHandler;
-	private @Autowired UserSpeakingFilter userSpeakingFilter;
+	private @Autowired UserSpeakingEventManager userSpeakingEventManager;
 	private final Pattern commandWord = Pattern.compile("join");
 
 	@Override
@@ -55,7 +52,7 @@ public class JoinVoiceChannelRequestListener extends CommandListener {
 			else {
 				AudioManager manager = voice.getGuild().getAudioManager();
 				manager.setReceivingHandler(audioHandler);
-				manager.setConnectionListener(userSpeakingFilter);
+				manager.setConnectionListener(userSpeakingEventManager);
 				manager.openAudioConnection(voice);
 				sendTempMessage(channel, "Connected to **" + voice.getName() + "**.", 5_000);
 			}

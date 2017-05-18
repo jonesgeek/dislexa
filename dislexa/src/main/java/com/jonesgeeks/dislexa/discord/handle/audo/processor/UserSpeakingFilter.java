@@ -3,35 +3,20 @@
  */
 package com.jonesgeeks.dislexa.discord.handle.audo.processor;
 
-import java.util.function.Predicate;
-
-import javax.annotation.PostConstruct;
-
 import com.jonesgeeks.dislexa.discord.events.UserSpeakingEvent;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.audio.hooks.ConnectionListener;
-import net.dv8tion.jda.core.audio.hooks.ConnectionStatus;
+import net.dv8tion.jda.core.audio.UserAudio;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.impl.JDAImpl;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.hooks.EventListener;
-
-import net.dv8tion.jda.core.hooks.IEventManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
-
-import net.dv8tion.jda.core.audio.UserAudio;
+import java.util.function.Predicate;
 
 /**
  * TODO: Implement this
  */
 @Component
-public class UserSpeakingFilter implements Predicate<UserAudio>, EventListener, ConnectionListener {
-	private @Autowired JDA api;
-	private @Autowired IEventManager eventManager;
-
+public class UserSpeakingFilter implements Predicate<UserAudio>, EventListener {
     private User speakingUser = null;
 
     /* (non-Javadoc)
@@ -48,28 +33,9 @@ public class UserSpeakingFilter implements Predicate<UserAudio>, EventListener, 
 	 */
 	@Override
 	public void onEvent(Event event) {
-		if (event instanceof WakewordDetectedEvent) {
-			if ( speakingUser == null ) {
-                speakingUser = ((WakewordDetectedEvent) event).getUser();
-                eventManager.handle(new UserSpeakingEvent(api, speakingUser, true));
-            }
+		if ( event instanceof UserSpeakingEvent ) {
+			UserSpeakingEvent userSpeakingEvent = (UserSpeakingEvent) event;
+			speakingUser = userSpeakingEvent.isSpeaking() ? userSpeakingEvent.getUser() : null;
 		}
-		
-	}
-
-	@Override
-	public void onUserSpeaking(User user, boolean speaking) {
-		if ( !speaking && user.equals(speakingUser) ) {
-			speakingUser = null;
-			eventManager.handle(new UserSpeakingEvent(api, user, false));
-		}
-	}
-
-	@Override
-	public void onStatusChange(ConnectionStatus connectionStatus) {
-	}
-
-	@Override
-	public void onPing(long l) {
 	}
 }
