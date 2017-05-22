@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 @Configuration
-@ComponentScan({"com.jonesgeeks.dislexa.config", "com.jonesgeeks.dislexa.discord"})
+@ComponentScan({"com.jonesgeeks.dislexa.config", "com.jonesgeeks.dislexa.discord", "com.jonesgeeks.dislexa.avs"})
 public class DislexaApplication {
 
 	public static void main(String[] args) {
