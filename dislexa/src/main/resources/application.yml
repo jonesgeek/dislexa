@@ -8,3 +8,10 @@ discord:
     wakeword:
 #      audioGain: 1
 #      sensitivity: 0.6
+
+amazon:
+  auth:
+    scope: profile
+
+server:
+  port: 3000

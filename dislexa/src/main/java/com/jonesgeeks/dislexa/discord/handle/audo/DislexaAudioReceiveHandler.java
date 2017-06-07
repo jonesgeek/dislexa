@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.UserSpeakingFilter;
-import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaOutputToVoiceChannel;
+import com.jonesgeeks.dislexa.discord.handle.audo.processor.AlexaConsumer;
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.OutputToSpeakerConsumer;
 import com.jonesgeeks.dislexa.discord.handle.audo.processor.WakewordConsumer;
 
@@ -33,7 +33,7 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	private @Autowired OutputToSpeakerConsumer outputToSpeaker;
 	private @Autowired WakewordConsumer wakeword;
 	private @Autowired UserSpeakingFilter userSpeakingFilter;
-	private @Autowired AlexaOutputToVoiceChannel alexaRespond;
+//	private @Autowired AlexaConsumer alexa;
 
 	// Queue that all audio is put on, perform wakeword detection, then filter what goes on alexaQueue
 	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<>(50));
@@ -65,6 +65,7 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 		new Thread(() -> {
 			alexaQueue.stream()
 				.forEach(outputToSpeaker);
+//				.forEach(alexa);
 		}).start();
 
 	}
