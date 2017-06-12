@@ -12,6 +12,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import com.amazon.alexa.avs.AudioInputFormat;
 import com.amazon.alexa.avs.RequestListener;
 import com.amazon.alexa.avs.http.AVSClient;
 import com.amazon.alexa.avs.message.request.RequestBody;
+import com.jonesgeeks.dislexa.avs.rest.auth.TokenManager;
 
 import net.dv8tion.jda.core.audio.UserAudio;
 
@@ -28,6 +31,9 @@ import net.dv8tion.jda.core.audio.UserAudio;
 //@Component
 public class AlexaConsumer implements Consumer<UserAudio> {
 	private @Autowired AVSClient client;
+	private @Autowired TokenManager tokenManager;
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	private PipedInputStream in;
 	private PipedOutputStream out;
@@ -56,17 +62,16 @@ public class AlexaConsumer implements Consumer<UserAudio> {
 				 */
 				@Override
 				public void onRequestSuccess() {
-					// TODO Auto-generated method stub
 					super.onRequestSuccess();
 				}
 				
 			};
 			
 			try {
+				client.setAccessToken(tokenManager.getAccessToken());
 				client.sendEvent(body, in, listener, AudioInputFormat.LPCM);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
 		}).start();
 	}

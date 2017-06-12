@@ -10,6 +10,8 @@ discord:
 #      sensitivity: 0.6
 
 amazon:
+  alexa:
+#    host: https://avs-alexa-na.amazon.com
   auth:
     scope: profile
 

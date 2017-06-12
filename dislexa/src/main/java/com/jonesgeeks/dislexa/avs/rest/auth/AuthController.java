@@ -12,6 +12,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,9 @@ public class AuthController {
 	private @Value("${amazon.auth.clientId}") String clientId;
 	private @Value("${amazon.auth.clientSecret}") String clientSecret;
 	private @Value("${amazon.auth.scope:alexa:all}") String scope;
+	
+	// TODO: replace this with just a TokenManager when we get a refreshing token manager.
+	private @Autowired SimpleTokenManager tokenManager;
 
     @RequestMapping("/")
     public void handleLogin(HttpServletResponse response) throws URISyntaxException, IOException {
@@ -80,7 +84,7 @@ public class AuthController {
 
                     return new ObjectMapper().readValue(IOUtils.toString(httpResponse.getEntity().getContent()), AccessToken.class);
                 });
-
+    	tokenManager.setAccessToken(token.getAccessToken());
     	return new ResponseEntity<>(token.getAccessToken(), HttpStatus.OK);
     }
 }
