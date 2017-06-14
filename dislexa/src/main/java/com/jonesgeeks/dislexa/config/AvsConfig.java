@@ -23,8 +23,7 @@ import com.amazon.alexa.avs.http.ParsingFailedHandler;
 import com.amazon.alexa.avs.message.response.Directive;
 import com.jonesgeeks.avs.directive.DialogRequestIdAuthority;
 import com.jonesgeeks.avs.directive.DirectiveEnqueuer;
-import com.jonesgeeks.dislexa.avs.rest.auth.SimpleTokenManager;
-import com.jonesgeeks.dislexa.avs.rest.auth.TokenManager;
+import com.jonesgeeks.dislexa.avs.rest.auth.RefreshingTokenManager;
 
 /**
  *
@@ -36,8 +35,8 @@ public class AvsConfig {
 	private @Autowired ParsingFailedHandler parsingFailedHandler;
 	
 	@Bean
-	public SimpleTokenManager tokenManager() {
-		return new SimpleTokenManager();
+	public RefreshingTokenManager tokenManager() {
+		return new RefreshingTokenManager();
 	}
 	
 	@Bean
