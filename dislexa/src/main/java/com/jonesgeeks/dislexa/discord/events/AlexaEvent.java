@@ -1,16 +1,11 @@
 package com.jonesgeeks.dislexa.discord.events;
 
+import com.jonesgeeks.avs.state.State;
+
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;
 
 public class AlexaEvent extends UserEvent {
-    public enum State {
-        WAKEWORD_DETECTED,
-        LISTENING,
-        PROCESSING,
-        IDLE
-    }
-
     private final State state;
 
     public AlexaEvent(JDA api, User user, State state) {

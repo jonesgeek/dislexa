@@ -33,7 +33,7 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 	private @Autowired OutputToSpeakerConsumer outputToSpeaker;
 	private @Autowired WakewordConsumer wakeword;
 	private @Autowired UserSpeakingFilter userSpeakingFilter;
-//	private @Autowired AlexaConsumer alexa;
+	private @Autowired AlexaConsumer alexa;
 
 	// Queue that all audio is put on, perform wakeword detection, then filter what goes on alexaQueue
 	private Queue<UserAudio> audioQueue = new Queue<>(new ArrayBlockingQueue<>(50));
@@ -64,8 +64,8 @@ public class DislexaAudioReceiveHandler implements UserAudioReceiveHandler {
 		// the wakeword processing
 		new Thread(() -> {
 			alexaQueue.stream()
-				.forEach(outputToSpeaker);
-//				.forEach(alexa);
+				.peek(outputToSpeaker)
+				.forEach(alexa);
 		}).start();
 
 	}

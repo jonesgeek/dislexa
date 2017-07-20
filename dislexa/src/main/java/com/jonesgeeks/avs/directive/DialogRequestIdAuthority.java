@@ -14,9 +14,12 @@ package com.jonesgeeks.avs.directive;
 
 import java.util.UUID;
 
+import org.springframework.stereotype.Component;
+
 /**
  * DialogRequestIdAuthority creates and keeps track of the active dialogRequestId.
  */
+@Component
 public class DialogRequestIdAuthority {
 
     private static final DialogRequestIdAuthority instance;

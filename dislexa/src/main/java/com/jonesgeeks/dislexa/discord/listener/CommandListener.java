@@ -24,7 +24,7 @@ import net.dv8tion.jda.core.hooks.EventListener;
 /**
  *
  */
-public abstract class CommandListener implements EventListener{
+public abstract class CommandListener implements EventListener {
 	private @Value("${discord.bot.command.prefix:!}") String prefix;
 	
 	public static final String BOTCOMMANDER_ROLE = "@botcommander";

@@ -6,15 +6,16 @@ package com.jonesgeeks.dislexa.discord.handle.audo.processor;
 import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.hooks.IEventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
 import com.jonesgeeks.dislexa.wakeword.WakewordDetector;
 
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.audio.UserAudio;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.hooks.IEventManager;
 
 /**
  *
@@ -35,7 +36,8 @@ public class WakewordConsumer implements Consumer<UserAudio>{
 		short[] snowboyData = convertToShortArray(pcm);
 		int result = wakewordDetector.RunDetection(snowboyData, snowboyData.length);
 		if (result > 0) {
-			eventManager.handle(new WakewordDetectedEvent(api, audio.getUser()));
+			User user = audio.getUser();
+			eventManager.handle(new WakewordDetectedEvent(api, user));
 		}
 	}
 

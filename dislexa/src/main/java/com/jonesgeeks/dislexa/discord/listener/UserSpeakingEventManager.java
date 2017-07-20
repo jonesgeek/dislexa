@@ -1,5 +1,6 @@
 package com.jonesgeeks.dislexa.discord.listener;
 
+import com.jonesgeeks.dislexa.discord.events.UserEvent;
 import com.jonesgeeks.dislexa.discord.events.UserSpeakingEvent;
 import com.jonesgeeks.dislexa.discord.events.WakewordDetectedEvent;
 import net.dv8tion.jda.core.JDA;
@@ -26,7 +27,7 @@ public class UserSpeakingEventManager implements EventListener, ConnectionListen
     public void onEvent(Event event) {
         if (event instanceof WakewordDetectedEvent) {
             if ( speakingUser == null ) {
-                speakingUser = ((WakewordDetectedEvent) event).getUser();
+                speakingUser = ((UserEvent) event).getUser();
                 eventManager.handle(new UserSpeakingEvent(api, speakingUser, true));
             }
         }
