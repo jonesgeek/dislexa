@@ -1,4 +1,4 @@
-package com.jonesgeeks.avs.state;
+package com.jonesgeeks.dislexa.avs.state;
 
 public enum State {
 	IDLE,

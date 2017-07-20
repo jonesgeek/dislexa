@@ -13,7 +13,10 @@ import net.dv8tion.jda.core.hooks.IEventManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * @deprecated
+ */
+@Deprecated
 @Component
 public class UserSpeakingEventManager implements EventListener, ConnectionListener {
 

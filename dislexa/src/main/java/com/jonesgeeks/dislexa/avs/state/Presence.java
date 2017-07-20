@@ -1,4 +1,4 @@
-package com.jonesgeeks.avs.state;
+package com.jonesgeeks.dislexa.avs.state;
 
 import net.dv8tion.jda.core.entities.User;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jonesgeeks.avs.state;
+package com.jonesgeeks.dislexa.avs.state;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,7 +27,7 @@ public class AlexaPresence implements Presence {
 
 
 	/* (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#getState()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#getState()
 	 */
 	@Override
 	public State getState() {
@@ -36,7 +36,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#getUser()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#getUser()
 	 */
 	@Override
 	public User getUser() {
@@ -45,7 +45,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setIdle()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setIdle()
 	 */
 	@Override
 	public void setIdle() {
@@ -55,7 +55,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setListening(net.dv8tion.jda.core.entities.User)
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setListening(net.dv8tion.jda.core.entities.User)
 	 */
 	@Override
 	public void setListening(User user) {
@@ -65,7 +65,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setActiveListening()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setActiveListening()
 	 */
 	@Override
 	public void setActiveListening() {
@@ -74,7 +74,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setThiking()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setThiking()
 	 */
 	@Override
 	public void setThiking() {
@@ -83,7 +83,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setSpeaking()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setSpeaking()
 	 */
 	@Override
 	public void setSpeaking() {
@@ -92,7 +92,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setMicrophoneOff()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setMicrophoneOff()
 	 */
 	@Override
 	public void setMicrophoneOff() {
@@ -101,7 +101,7 @@ public class AlexaPresence implements Presence {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.jonesgeeks.avs.state.Presence#setSystemError()
+	 * @see com.jonesgeeks.dislexa.avs.state.Presence#setSystemError()
 	 */
 	@Override
 	public void setSystemError() {

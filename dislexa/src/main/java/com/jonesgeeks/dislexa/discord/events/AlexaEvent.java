@@ -1,6 +1,6 @@
 package com.jonesgeeks.dislexa.discord.events;
 
-import com.jonesgeeks.avs.state.State;
+import com.jonesgeeks.dislexa.avs.state.State;
 
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.User;

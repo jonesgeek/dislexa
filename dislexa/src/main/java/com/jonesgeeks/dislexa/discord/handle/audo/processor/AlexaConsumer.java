@@ -16,14 +16,12 @@ import javax.sound.sampled.LineUnavailableException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.amazon.alexa.avs.AudioCapture;
 import com.amazon.alexa.avs.AudioStateOutputStream;
 import com.amazon.alexa.avs.RecordingRMSListener;
 import com.amazon.alexa.avs.RecordingStateListener;
-import com.jonesgeeks.avs.state.AlexaPresence;
 import com.jonesgeeks.dislexa.discord.events.UserSpeakingEvent;
 
 import net.dv8tion.jda.core.audio.UserAudio;
